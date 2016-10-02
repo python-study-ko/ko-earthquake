@@ -8,3 +8,8 @@
 ##2.아이디어 토론
 다양한 아이디어에 대해 토론을 하는것은 [아이디어토론 마일스톤](https://github.com/python-study-ko/ko-earthquake/milestone/2)을 이용해 주시면 됩니다.
 각 아이디어에 대해 이슈에 등록해두고 토론을 거쳐 채택이 될경우 wiki와 개발관련 이슈에 등록을 해두고 작업을 진행하면 됩니다.
+
+## 3. 자료 구경하기
+1. 깃을 클론한뒤 `./makevenv.sh`를 실행 하세요
+2. `source .venv/bin/activate`로 가상환경을 활성화 시키세요
+3. data폴더에서 있는 conect_data.py 스크립트로 파일 호출을 테스트 하거나 다른 샘플 코드를 작성 하시면 됩니다.
