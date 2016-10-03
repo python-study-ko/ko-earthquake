@@ -11,7 +11,7 @@ then
 fi
 
 echo "-------파이썬 가상환경 생성기-------"
-virtualenv -p python3.5 .venv
+virtualenv -p python3 .venv
 
 . .venv/bin/activate
 
