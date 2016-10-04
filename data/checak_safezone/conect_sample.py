@@ -26,8 +26,8 @@ FildName = {
     "경도" : "lon",
     "수용 인원" : "shel_av",
     "주소" : "shel_av",
-    "자료생성일" : "",
-    "행정구역 코드" : "", # 코드 출처 확인 불가(행정동, 법정동 코드 번호 모두 아님)
+    "생성일" : "create_dat",
+    "행정구역 코드" : "b_area_cd", # 코드 출처 확인 불가(행정동, 법정동 코드 번호 모두 아님)
 }
 
 with engine.connect() as db:
@@ -37,3 +37,7 @@ with engine.connect() as db:
     result = db.execute("select {filds} from safezone".format(filds=",".join(filds)))
     for row in result:
         print(row)
+
+
+
+
