@@ -64,8 +64,7 @@ class Bridge:
                 print("{0} 종류의 DB는 지원하지 않습니다. 현재 지원하는 DB는 {1} 입니다.".format(db_type, list(prefix.keys())))
 
         # DB 연결을 위한 기본 변수 설정
-        with open(self.ini_path,'r') as file:
-            print(file.read())
+        with open(self.ini_path ,'r') as file:
             ini = json.loads(file.read())
 
             # 테이블별 필드 명세정보
