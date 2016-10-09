@@ -1,8 +1,8 @@
 # 지진대피소 원본 DB에서 추출한 자료를 검증하기 위한 DB입니다.
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Float
-from sqlalchemy import create_engine, ForeignKey
-from sqlalchemy.orm import sessionmaker, relationship, backref
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import  relationship, backref
 
 
 Base = declarative_base()
@@ -54,26 +54,3 @@ class state(Base):
     safe =
 """
 
-# 세션 연결
-
-engine = create_engine('sqlite:///check_safezonee.sqlite')
-Session = sessionmaker(bind=engine)
-session = Session()
-
-# 스키마 생성
-Base.metadata.create_all(engine)
-
-#test code
-s_point = POI('대피소 샘플파일','','36.1457','127.747')
-print(s_point)
-print(s_point.detail)
-
-s_point.detail = Detail('확인')
-
-
-session.add(s_point)
-session.commit()
-
-for row in session.query(POI).all():
-    print(row.name, row.detail.test, row.type, row.detail)
-# sample.id
