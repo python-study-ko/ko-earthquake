@@ -11,7 +11,7 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 # 스키마 생성
-# Base.metadata.create_all(engine)
+Base.metadata.create_all(engine)
 
 #test code
 
