@@ -34,6 +34,7 @@ for row in session.query(POI).all():
 
 # 관계 자료 변경 테스트(완료)
 """
+# 자료 하나만 들고올떈 .one()활용
 test1 = session.query(POI).filter_by(id=1).one()
 test1.detail.test = "다시변경 확인"
 
