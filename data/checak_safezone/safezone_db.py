@@ -36,7 +36,7 @@ class POI(Base):
         self.lon = lon
 
     def __repr__(self):
-        return "<{name} 대피소, {type}, {lat}, {lon} >".format(type=self.type, name=self.name, lat=self.lat, lon=self.lon)
+        return "< {lat}, {lon} >".format(lat=self.lat, lon=self.lon)
 
 
 # 대피소 정보
