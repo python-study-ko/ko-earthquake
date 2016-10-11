@@ -1,6 +1,6 @@
 # 지진대피소 원본 DB에서 추출한 자료를 검증하기 위한 DB입니다.
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, Float, Boolean
+from sqlalchemy import Column, Integer, String, Float, Boolean, Date
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship, backref
 
@@ -38,6 +38,7 @@ class POI(Base):
     def __repr__(self):
         return "<{name} 대피소, {type}, {lat}, {lot} >".format(type=self.type, name=self.name, lat=self.lat, lot=self.lot)
 
+
 # 대피소 정보
 class Info(Base):
     """
@@ -50,7 +51,8 @@ class Info(Base):
     name = Column(String(80))
     sh_type = Column(String(8))
     sh_av = Column(Integer)
-    def __init__(self, name, sh_type ='미확인', sh_av = 0):
+
+    def __init__(self, name, sh_type='미확인', sh_av=0):
         self.name = name
         self.sh_type = sh_type
         self.sh_av = sh_av
@@ -72,16 +74,19 @@ class Detail(Base):
     """
     __tablename__ = 'detail'
     id = Column(Integer, primary_key=True)
-    auth_date = Column()
+    auth_date = Column(Date)
     floor = Column(Integer)
     util = Column(String(6))
-    test = Column(String(10))
+    area = Column(Float)
 
-    def __init__(self, test):
-        self.test = test
+    def __init__(self, auth_date, area, floor, util):
+        self.auth_date = auth_date
+        self.area = area
+        self.floor = floor
+        self.util = util
 
     def __repr__(self):
-        return 'test'
+        return '< shelv detail >'
 
 
 # 대피소 정보에 대한 상태정보
