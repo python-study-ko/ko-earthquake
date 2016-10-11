@@ -3,15 +3,37 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from data.checak_safezone.safezone_db import *
+from data.bridge import Bridge
 
 
 # 세션 연결
-engine = create_engine('sqlite:///test/check_safezonee.sqlite')
+engine = create_engine('sqlite:///test_safezone.sqlite')
 Session = sessionmaker(bind=engine)
 session = Session()
 
 # 스키마 생성
 Base.metadata.create_all(engine)
+
+# 지진대피소 db연결
+origin_db = Bridge("ini_sample.json")
+shelv = origin_db.info['safezone']
+
+# 추출할 자료
+choice_field = ["이름","위도","경도"]
+
+# 추출된 자료
+poi_list = []
+
+with origin_db.engin.connect() as db:
+    result = db.execute("select {filds} from safezone".format(filds=",".join([shelv[x] for x in choice_field])))
+    for 이름, 위도, 경도 in result:
+        shelv_poi = POI(위도,경도)
+        shelv_poi.info = Info(이름)
+        poi_list.append(shelv_poi)
+
+# 검증용 db에 추가
+session.add_all(poi_list)
+session.commit()
 
 #test code
 
