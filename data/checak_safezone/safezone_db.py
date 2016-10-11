@@ -9,43 +9,72 @@ Base = declarative_base()
 
 # 지진대피소의 위치정보
 class POI(Base):
+    """
+    address: 주소
+    lat: 위도
+    lot: 경도
+    """
     __tablename__ = 'point'
     id = Column(Integer, primary_key=True)
-    name = Column(String(80))
     address = Column(String(90))
     lat = Column(Float(6))
     lot = Column(Float(6))
-    type = Column(String(8))
 
     # 관계 연결
     detail_id = Column(Integer, ForeignKey('detail.id'))
     detail = relationship("Detail", backref=backref("point", uselist=False))
 
+    info_id = Column(Integer, ForeignKey('info.id'))
+    info = relationship("Info", backref=backref("point", uselist=False))
+
     state_id = Column(Integer, ForeignKey('state.id'))
     state = relationship("State", backref=backref("point", uselist=False))
 
-    def __init__(self, name, address, lat, lot, type='미확인'):
-        self.name = name
+    def __init__(self, lat, lot, address=""):
         self.address = address
         self.lat = lat
         self.lot = lot
-        self.type = type
 
     def __repr__(self):
         return "<{name} 대피소, {type}, {lat}, {lot} >".format(type=self.type, name=self.name, lat=self.lat, lot=self.lot)
+
+# 대피소 정보
+class Info(Base):
+    """
+    name: 대피소명
+    sh_type: 대피소 종류 (건물, 주차장, 공터, 학교 등)
+    sh_av: 수용인원
+    """
+    __tablename__ = 'info'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(80))
+    sh_type = Column(String(8))
+    sh_av = Column(Integer)
+    def __init__(self, name, sh_type ='미확인', sh_av = 0):
+        self.name = name
+        self.sh_type = sh_type
+        self.sh_av = sh_av
+
+    def __repr__(self):
+        return "<{name} 대피소, {type}>".format(type=self.type, name=self.name, lat=self.lat, lot=self.lot)
 
 
 # 건물 세부정보(건축물 대장, 내진 설계 여부등)
 class Detail(Base):
     """
-    테이블 명세
-    type: 대피소 종류 (건물, 주차장, 공터, 학교 등)
-    __date: 허가일
+    건물 세부정보 테이블 명세
+
+    auth_date: 허가일
+    floor : 건물 층수
+    util : 건물 용도
     area: 연면적
     
     """
     __tablename__ = 'detail'
     id = Column(Integer, primary_key=True)
+    auth_date = Column()
+    floor = Column(Integer)
+    util = Column(String(6))
     test = Column(String(10))
 
     def __init__(self, test):
@@ -74,4 +103,4 @@ class State(Base):
         self.safe_checke = safe
 
     def __repr__(self):
-        return '< {}의 상태정보 입니다>'.format(id)
+        return '< {} >'.format(id)
