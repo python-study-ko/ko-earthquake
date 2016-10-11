@@ -20,9 +20,72 @@ import configparser
 ini = configparser.ConfigParser()
 ini.read("API_KEY.ini")
 
+
+# API 정리
 vworld_key = ini.get("vworld", "KEY")
 vworld_url = "http://apis.vworld.kr/geocode"
 
+google_key = ini.get("google","KEY")
+google_url = "https://maps.googleapis.com/maps/api/geocode/json"
+
+
+
+
+# 세션 연결
+engine = create_engine('sqlite:///check_safezone.sqlite')
+Session = sessionmaker(bind=engine)
+session = Session()
+
+data = session.query(POI).all()[:20]
+all = len(data)
+
+# 구글 테스트 코드
+def google_ad(lat, lon):
+    """
+    경위도 좌표를 역지오코딩하여 주소를 취득
+    :param lat: 위도(y)
+    :param lon: 경도(x)
+    :return: 주소 혹은 실패 문구
+    """
+    parms = {"key": google_key,"latlng":"{},{}".format(lat,lon)}
+    try:
+        r = requests.get(google_url, params=parms)
+        status = r.json()["status"]
+        results = r.json()["results"]
+
+        if status == "OK":
+            #return results[0]["address_components"] # 주소 쳬계별로 분류된 결과
+            return results[0]["formatted_address"] # 전체 주소
+        else:
+            return "실패: {}".format(status)
+    except Exception as e:
+        return "실패: 에러발생 {}".format(e)
+
+# 테스트 결과 확인용 변수
+g_ad_li = []
+g_count = 0
+g_ok = 0
+g_fail = 0
+
+print("google 결과")
+for poi in data:
+    g_count += 1
+    print(g_count,"/",all)
+    print(poi,"변환 요청")
+    ad = google_ad(poi.lat,poi.lon)
+    if ad[:2] == "실패":
+        g_fail += 1
+    else:
+        g_ok += 1
+    print("변환 주소: {}".format(ad))
+    g_ad_li.append(ad)
+
+
+
+
+
+
+# vworld 테스트 코드
 
 def address(lat, lon):
     """
@@ -43,35 +106,34 @@ def address(lat, lon):
         return "요청 실패"
 
 
-# 세션 연결
-engine = create_engine('sqlite:///check_safezone.sqlite')
-Session = sessionmaker(bind=engine)
-session = Session()
 
-data = session.query(POI).all()[:300]
+print("vworld 결과")
 
-ad_li = []
-all = len(data)
-count = 0
-ok = 0
-fail = 0
+# 테스트 결과 확인용 변수
+v_ad_li = []
+v_count = 0
+v_ok = 0
+v_fail = 0
 
 for poi in data:
-    count += 1
-    print(count,"/",all)
+    v_count += 1
+    print(v_count,"/",all)
     print(poi,"변환 요청")
     ad = address(poi.lat,poi.lon)
     if ad in ["요청 실패","주소가 조회되지 않습니다"]:
-        fail += 1
+        v_fail += 1
     else:
-        ok += 1
+        v_ok += 1
     print("변환 주소: {}".format(ad))
-    ad_li.append(ad)
+    v_ad_li.append(ad)
 
-print("{0}개 작업 결과  성공 : {1}, 실패 : {2}".format(all,ok,fail))
+
+print("구글 역지오코딩 결과/ 요청 :{0}  성공 : {1}, 실패 : {2}".format(all,g_ok,g_fail))
+print("{0}개 작업 결과  성공 : {1}, 실패 : {2}".format(all,v_ok,v_fail))
 
 """
 for poi in data:
     poi.address = address(poi.lat, poi.lon)
 session.commit()
+
 """
