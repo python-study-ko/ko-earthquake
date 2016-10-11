@@ -13,7 +13,7 @@
 """
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from safezone_db import *
+from data.checak_safezone.safezone_db import *
 from data.bridge import Bridge
 
 
