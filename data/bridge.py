@@ -1,4 +1,5 @@
 from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 import json
 
 """
@@ -68,11 +69,19 @@ class Bridge:
             ini = json.loads(file.read())
 
             # 테이블별 필드 명세정보
-            info = ini['tables']
+            self.info = ini['tables']
 
             # DB 연결을 위한 경로
             self.path = path_prefix(ini["type"], ini["path"])
             # info에 명시한 테이블 목록
-            self.tables = list(info.keys())
+            self.tables = list(self.info.keys())
             self.engin = create_engine(self.path, echo=True)
+
+        Session = sessionmaker(bind=self.engin)
+        self.session = Session()
+
+    def query(self, table):
+        # 할일: 여러 테이블 연결 지원하기
+        if type(table) == str():
+            return self.session.query(table)
 
