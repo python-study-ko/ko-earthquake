@@ -5,13 +5,12 @@ import requests
 from bs4 import BeautifulSoup
 
 url ='https://www.google.co.kr/search?q='
-data = '817 Haksanyeongdong-ro, Yanggang-myeon, Yeongdong, Chungcheongbuk-do, South Korea'
+data = '45 Sannyang-gil, Ganggyeong-eup, Nonsan, Chungcheongnam-do, South Korea'
 
 sourcecode = requests.get(url + data)
 plaintext = sourcecode.text
 soup = BeautifulSoup(plaintext, "html.parser")
-soup = soup.prettify()
 
-print(soup)
+test = soup.find_all('b')[1].contents
 
-Place = soup.find_all('div', {'class' : 'vk_sh vk_bk'})
+print(test)
