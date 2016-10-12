@@ -61,6 +61,8 @@ def google_ad(lat, lon):
     except Exception as e:
         return "실패: 에러발생 {}".format(e)
 
+
+
 # 테스트 결과 확인용 변수
 g_ad_li = []
 g_count = 0
@@ -85,51 +87,7 @@ for poi in data:
 
 
 
-# vworld 테스트 코드
-
-def address(lat, lon):
-    """
-    경위도 좌표를 역지오코딩하여 주소를 취득
-    :param lat: 위도(y)
-    :param lon: 경도(x)
-    :return: 주소 혹은 실패 문구
-    """
-    parms = {"service": "reverse", "apiKey": vworld_key, "select": "road", "crs": "epsg:4326", "x": lon, "y": lat}
-    try:
-        r = requests.get(vworld_url, params=parms)
-        result = r.json()["response"]
-        if result["result"] == "":
-            return "주소가 조회되지 않습니다"
-        else:
-            return "{}".format(result["result"]["addr"])
-    except:
-        return "요청 실패"
-
-
-
-print("vworld 결과")
-
-# 테스트 결과 확인용 변수
-v_ad_li = []
-v_count = 0
-v_ok = 0
-v_fail = 0
-
-for poi in data:
-    v_count += 1
-    print(v_count,"/",all)
-    print(poi,"변환 요청")
-    ad = address(poi.lat,poi.lon)
-    if ad in ["요청 실패","주소가 조회되지 않습니다"]:
-        v_fail += 1
-    else:
-        v_ok += 1
-    print("변환 주소: {}".format(ad))
-    v_ad_li.append(ad)
-
-
 print("구글 역지오코딩 결과/ 요청 :{0}  성공 : {1}, 실패 : {2}".format(all,g_ok,g_fail))
-print("{0}개 작업 결과  성공 : {1}, 실패 : {2}".format(all,v_ok,v_fail))
 
 """
 for poi in data:
