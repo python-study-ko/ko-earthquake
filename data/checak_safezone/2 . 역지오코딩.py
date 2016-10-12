@@ -31,10 +31,12 @@ engine = create_engine('sqlite:///check_safezone.sqlite')
 Session = sessionmaker(bind=engine)
 session = Session()
 
-data = session.query(POI).all()[:100]
+data = session.query(POI).all()
 all = len(data)
 
-
+print("============================")
+print(" 작업할 자료는 총 {}개입니다".format(all))
+print("============================")
 # 다음 테스트 코드
 def daum_ad(lat, lon):
     """
@@ -60,28 +62,47 @@ d_count = 0  # 총 작업 횟수
 d_ok = 0  # 성공 횟수
 d_fail = 0  # 실패 횟수
 
-print("다음 지오코딩 결과")
+print("다음 역지오코딩후 db에 반영")
 for poi in data:
     d_count += 1
     print(d_count, "/", all, " : ", poi, "변환 요청")
     ad = daum_ad(poi.lat, poi.lon)
     if ad[:2] == "실패":
         d_fail += 1
+        print("실패")
     else:
         # 조회 성공시 db에 주소 입력
         d_ok += 1
+        poi.address = ad
+        print("성공")
 
-    print("변환 주소: {}".format(ad))
-    d_ad_li.append(ad)
-
-
+session.commit()
 print("==========================================================================")
 print("다음 지오코딩 결과/ 요청 :{0}  성공 : {1}, 실패 : {2}".format(all, d_ok, d_fail))
 print("==========================================================================")
 
-"""
-for poi in data:
-    poi.address = address(poi.lat, poi.lon)
-session.commit()
+
+""""
+작업 결과
+==========================================================================
+다음 지오코딩 결과/ 요청 :6119  성공 : 6114, 실패 : 5
+==========================================================================
+
+실패한 5건은 아래와 같습니다.
+[ id: 1684 | lat: 35.2016 | lon:126.1367 ]
+[ id: 2189 | lat: 34.9415 | lon:128.088 ]
+[ id: 2484 | lat: 34.6792 | lon:127.3584 ]
+[ id: 4921 | lat: 37.5221 | lon:126.6685 ]
+[ id: 5557 | lat: 37.6568 | lon:127.1154 ]
+
+수작업으로 확인한 결과
+id 1684 | 낙월초등학교
+id 2189 | 삼천포종합운동장
+id 2484 | 과역초등학교
+id 4921 | 인천가현초등학교
+id 5557 | 인근공터로 유츄되나 확인 불가
+
+위와 같이 파악됬습니다. 그래서 다음 작업에서 해당 자료에 대한 보정 작업을 진행할 예정입니다.
 
 """
+
