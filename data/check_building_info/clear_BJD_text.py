@@ -2,7 +2,7 @@
 from pprint import pprint
 
 # 테스트할때 최대 반복회수 지정(0일시 전체 자료를 순회)
-count_limit = 0
+count_limit = 200
 
 # 시군구 코드
 sgg_CD = {}
@@ -54,6 +54,11 @@ with open("법정동코드.txt", encoding='euc-kr') as data:
                 else:
                     bjd_CD[CD] = AD
 
-    print(count)
-    print("시군구 코드 개수 : {0}, 법정동 코드 갯수: {1}".format(len(sgg_CD),len(bjd_CD)))
-    pprint(sgg_CD)
+print(count)
+sgg_count = len(sgg_CD)
+bjd_count = len(bjd_CD)
+all_count = sgg_count+bjd_count
+
+print("존재 코드: {0}, 폐지 코드: {1}".format(all_count,count-all_count))
+print("시군구 코드 개수 : {0}, 법정동 코드 갯수: {1}".format(sgg_count,bjd_count))
+pprint(sgg_CD)
