@@ -2,7 +2,7 @@
 from pprint import pprint
 
 # 테스트할때 최대 반복회수 지정(0일시 전체 자료를 순회)
-count_limit = 200
+count_limit = 0
 
 # 시군구 코드
 sgg_CD = {}
@@ -10,6 +10,7 @@ sgg_CD = {}
 # 법정동 코드
 bjd_CD = {}
 
+all_end = []
 
 def check(list):
     """
@@ -34,25 +35,32 @@ with open("법정동코드.txt", encoding='euc-kr') as data:
                 break
         count += 1
         info = line.split()
+        result = check(info)
 
-        # 시군구 코드
-        if len(info) in [3, 4]:
-            result = check(info)
-            if result:
-                CD, AD = result
-                # 세종특별자치시 필터
-                sgg_CD[CD[:5]] = AD
+        if result == False:
+            continue
+        else:
+            CD,AD = result
+            AD_size = AD[-1][-1]
 
-        # 법정동 코드
-        elif len(info) in [5,6,7,8]:
-            result = check(info)
-            if result:
-                CD,AD = result
-                # 광역시외 시군구 필터
-                if AD[-1][-1] in ['시','군','구']:
-                    sgg_CD[CD[:5]] = AD
-                else:
-                    bjd_CD[CD] = AD
+            if AD_size in ['시','군','구','도']:
+                sgg_CD[CD] = AD
+            else:
+                bjd_CD[CD] = AD
+
+    """
+    전체 주소의 마지막 글자(시군구등) 종류 추출 코드
+            ad_size = AD[-1][-1]
+            if AD[-1][-1] not in  all_end:
+                all_end.append(AD[-1][-1])
+
+    print(all_end)
+
+    # 결과 : ['시', '구', '동', '로', '가', '군', '읍', '리', '면', '도', ')']
+    """
+
+
+
 
 print(count)
 sgg_count = len(sgg_CD)
