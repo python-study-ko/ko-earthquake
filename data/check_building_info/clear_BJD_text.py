@@ -1,8 +1,8 @@
 # 행정표준코드에서 다운로드 받은 우리나라 전체 법정동코드.txt 파일에서 필요한 코드만 추출하는 코드입니다.
 from pprint import pprint
 
-# 테스트할때 최대 반복회수 지정
-count_limit = 100
+# 테스트할때 최대 반복회수 지정(0일시 전체 자료를 순회)
+count_limit = 0
 
 # 시군구 코드
 sgg_CD = {}
@@ -27,8 +27,11 @@ def check(list):
 with open("법정동코드.txt", encoding='euc-kr') as data:
     count = 0
     for line in data:
-        #if count == count_limit:
-        #       break
+        if count_limit == 0:
+            pass
+        else:
+            if count == count_limit:
+                break
         count += 1
         info = line.split()
 
