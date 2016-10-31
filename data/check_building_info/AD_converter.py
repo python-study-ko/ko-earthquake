@@ -19,7 +19,7 @@ def uplist(data,ad,num):
     for x in data:
         try:
             if data[x][num] == ad:
-                cd_list[x] = sgg[x]
+                cd_list[x] = data[x]
         except:
             pass
     return cd_list
@@ -38,10 +38,57 @@ def sgg_cd(ad):
 
         # 유일한 시군구 코드가 나올 경우 검색 종료
         if len(data) == 1:
-            return data
+            for x in data:
+                return (x,data[x])
         # 결과값이 없을 경우 None값 전달
         elif len(data) == 0:
             return None
 
-li = sgg_cd("광주광역시 동구 운림동")
-print(li)
+def remove_sgg(sgg_ad,ad):
+    # 전체 주소에서 시구군 부분만 제거해 준다
+    for x in sgg_ad:
+        ad.remove(x)
+    return ad
+
+def bjd_cd(CD_ssg,ad):
+    ad_list = ad.split()
+    data = {}   # 해당 지역의 모든 법정동 코드
+
+    # 검색하려는 주소가 속한 시구군의 법정동 코드만 추출
+    for x in bjd.keys():
+        # 법정동 코드의 앞 5자리(시구군코드 부분)으로 해당 지역의 모든 법정동 코드 추출
+        if x[:5] == CD_ssg[0]:
+            # data 자료는 {'법정동코드번호':['시구군을 제외한 법정동 주소 리스트']}로 구성한다
+            data[x] = remove_sgg(CD_ssg[1],bjd[x])
+
+    # 추출된 자료에서 해당 지역의 법정동 코드 추출
+    ad_list = remove_sgg(CD_ssg[1],ad_list)
+
+    for x in ad_list:
+        num = ad_list.index(x)
+        data = uplist(data,x,num)
+
+        # 유일한 법정동 코드가 나올 경우 검색 종료
+        if len(data) == 1:
+            for x in data:
+                return (x[5:],data[x])
+        # 결과값이 없을 경우 None값 전달
+        elif len(data) == 0:
+            return None
+
+
+
+
+def find_cd(ad):
+    CD_sgg = sgg_cd(ad)
+    if CD_sgg:
+        CD_bjd = bjd_cd(CD_sgg,ad)
+        if CD_bjd:
+            return CD_sgg,CD_bjd
+        else:
+            return None
+    else:
+        return None
+
+print(find_cd("광주광역시 남구 방림동 방림휴먼시아"))
+print(find_cd("광주광역시 동구 운림동 455"))
