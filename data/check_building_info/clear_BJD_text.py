@@ -26,7 +26,7 @@ def check(list):
 
 
 # 법정동 코드 자료에서 현재 폐지되지 않는(존재하는) 법정동,시군구 코드 추출
-with open("법정동코드.txt", encoding='euc-kr') as data:
+with open("BJD_CD.txt", encoding='euc-kr') as data:
     count = 0
     for line in data:
         if count_limit == 0:
@@ -68,6 +68,7 @@ all_count = sgg_count+bjd_count
 print("존재 코드: {0}, 폐지 코드: {1}".format(all_count,count-all_count))
 print("시군구 코드 개수 : {0}, 법정동 코드 갯수: {1}".format(sgg_count,bjd_count))
 pprint(sgg_CD)
+pprint(bjd_CD)
 
 # json으로 저장
 with open('sgg.json',mode='w',encoding='utf-8') as f:
