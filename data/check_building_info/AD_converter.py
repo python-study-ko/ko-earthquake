@@ -38,10 +38,10 @@ def sgg_cd(ad):
 
         # 유일한 시군구 코드가 나올 경우 검색 종료
         if len(data) == 1:
-            return True,data
-        # 아무런 결과가 없을 경우 None값 전달
+            return data
+        # 결과값이 없을 경우 None값 전달
         elif len(data) == 0:
-            return False,data
+            return None
 
-ok,li = sgg_cd("광주광역시 남구 방림동")
-print(ok,li)
+li = sgg_cd("광주광역시 동구 운림동")
+print(li)
