@@ -1,5 +1,5 @@
 import json
-
+import os
 """
 주소를 입력하면 시구군,법정동 코드를 찾아주는 소스코드 입니다.
 행정표준코드관리 시스템에서 다운로드 받은 법정동코드 전체 자료(BJD_CD.txt)에서
@@ -16,10 +16,12 @@ import json
 """
 
 # 시군구,법정동 자료 불러오기
-with open('sgg.json') as f:
+path = os.path.abspath('.')
+
+with open(os.path.join(path,'sgg.json')) as f:
     sgg = json.load(f)
 
-with open('bjd.json') as f:
+with open(os.path.join(path,'bjd.json')) as f:
     bjd = json.load(f)
 
 def uplist(data,ad,num):
@@ -105,3 +107,5 @@ def find_cd(ad):
     else:
         return None
 
+# test code
+print(find_cd("광주광역시 동구 운림동 455"))
