@@ -1,0 +1,16 @@
+{
+    "type":"sqlite",
+    "path":"origin_safezone.sqlite",
+    "tables":{
+        "safezone": {
+            "번호" : "shel_id",
+            "이름" : "shel_nm",
+            "위도" : "lat",
+            "경도" : "lon",
+            "수용 인원" : "shel_av",
+            "주소" : "shel_av",
+            "자료생성일" : "create_dat",
+            "행정구역 코드" : "b_area_cd"
+        }
+    }
+}

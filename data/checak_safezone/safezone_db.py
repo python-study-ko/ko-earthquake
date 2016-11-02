@@ -12,13 +12,13 @@ class POI(Base):
     """
     address: 주소
     lat: 위도
-    lot: 경도
+    lon: 경도
     """
     __tablename__ = 'point'
     id = Column(Integer, primary_key=True)
     address = Column(String(90))
     lat = Column(Float(6))
-    lot = Column(Float(6))
+    lon = Column(Float(6))
 
     # 관계 연결
     detail_id = Column(Integer, ForeignKey('detail.id'))
@@ -30,13 +30,13 @@ class POI(Base):
     state_id = Column(Integer, ForeignKey('state.id'))
     state = relationship("State", backref=backref("point", uselist=False))
 
-    def __init__(self, lat, lot, address=""):
+    def __init__(self, lat, lon, address=""):
         self.address = address
         self.lat = lat
-        self.lot = lot
+        self.lon = lon
 
     def __repr__(self):
-        return "<{name} 대피소, {type}, {lat}, {lot} >".format(type=self.type, name=self.name, lat=self.lat, lot=self.lot)
+        return "< {lat}, {lon} >".format(lat=self.lat, lon=self.lon)
 
 
 # 대피소 정보
@@ -58,7 +58,7 @@ class Info(Base):
         self.sh_av = sh_av
 
     def __repr__(self):
-        return "<{name} 대피소, {type}>".format(type=self.type, name=self.name, lat=self.lat, lot=self.lot)
+        return "<{name} 대피소, {type}>".format(type=self.type, name=self.name)
 
 
 # 건물 세부정보(건축물 대장, 내진 설계 여부등)
