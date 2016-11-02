@@ -1,0 +1,10 @@
+{
+    "type":"sqlite",
+    "path":"sample.sqlite",
+    "tables":{
+        "sample": {
+            "번호" : "id",
+            "이름" : "name"
+        }
+    }
+}
