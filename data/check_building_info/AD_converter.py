@@ -16,10 +16,10 @@ import os
 """
 
 # 시군구,법정동 자료 불러오기
-with open('sgg.json') as f:
+with open('../check_building_info/sgg.json') as f:
     sgg = json.load(f)
 
-with open('bjd.json') as f:
+with open('../check_building_info/bjd.json') as f:
     bjd = json.load(f)
 
 def uplist(data,ad,num):
