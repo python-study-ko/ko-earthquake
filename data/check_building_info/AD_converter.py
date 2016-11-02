@@ -16,12 +16,10 @@ import os
 """
 
 # 시군구,법정동 자료 불러오기
-path = os.path.abspath('.')
-
-with open(os.path.join(path,'sgg.json')) as f:
+with open('sgg.json') as f:
     sgg = json.load(f)
 
-with open(os.path.join(path,'bjd.json')) as f:
+with open('bjd.json') as f:
     bjd = json.load(f)
 
 def uplist(data,ad,num):
