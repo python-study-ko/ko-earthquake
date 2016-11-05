@@ -11,12 +11,17 @@ Base = declarative_base()
 class POI(Base):
     """
     address: 주소
+    hjdAd: 행정동 주소
+    bjdAd: 법정동 주소
+    roadAd: 도로명 주소
     lat: 위도
     lon: 경도
     """
     __tablename__ = 'point'
     id = Column(Integer, primary_key=True)
-    address = Column(String(90))
+    hjdAd = Column(String(90))
+    bjdAd = Column(String(90))
+    roadAd = Column(String(90))
     lat = Column(Float(6))
     lon = Column(Float(6))
 
@@ -30,8 +35,10 @@ class POI(Base):
     state_id = Column(Integer, ForeignKey('state.id'))
     state = relationship("State", backref=backref("point", uselist=False))
 
-    def __init__(self, lat, lon, address=""):
-        self.address = address
+    def __init__(self, lat, lon, hjdAd="", bjdAd="", roadAd=""):
+        self.hjdAd = hjdAd
+        self.bjdAd = bjdAd
+        self.roadAd = roadAd
         self.lat = lat
         self.lon = lon
 
