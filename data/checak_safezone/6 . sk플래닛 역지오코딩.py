@@ -14,18 +14,41 @@ API URL : http://apis.vworld.kr/geocode?service=reverse&apiKey=인증키&[검색
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from data.checak_safezone.safezone_db import *
-from data.checak_safezone.google_ad_trans import trans_ad
 import requests
 import configparser
+import progressbar
 from pprint import pprint
 
 ini = configparser.ConfigParser()
 ini.read("API_KEY.ini")
 
 # API 정리
-daum_key = ini.get("daum", "KEY")
-daum_url = "https://apis.daum.net/local/geo/coord2detailaddr"
+api_key = ini.get("sk", "KEY")
+api_url = "https://apis.skplanetx.com/tmap/geo/reversegeocoding"
 
+# sk플래닛 역지오코딩
+def sk_ad(lat, lon):
+    """
+    경위도 좌표를 역지오코딩하여 주소를 취득
+    :param lat: 위도(y)
+    :param lon: 경도(x)
+    :return: 주소 혹은 None
+    """
+    parms = {"version": 1, "lat": lat, "lon": lon, "coordType": "WGS84GEO", 'addressType':'A10'}
+    headers = {'appKey': api_key}
+    try:
+        r = requests.get(api_url, params=parms, headers=headers)
+        if r.status_code == 200:
+            ad = r.json()['addressInfo']['fullAddress'].split(',') # 할일: 응답받은 자료에서 행정동,법정동,도로명주소 분리
+            if len(ad) >= 4:
+                ad = [ad[0], ad[1], ','.join(ad[2:])]
+            return ad # (행정동,법정동,도로명) 주소로 넘겨줌
+        else:
+            return None
+    except Exception as e:
+        return "실패: 에러발생 {}".format(e)
+
+# 변환 작업
 # 세션 연결
 engine = create_engine('sqlite:///check_safezone.sqlite')
 Session = sessionmaker(bind=engine)
@@ -34,75 +57,48 @@ session = Session()
 data = session.query(POI).all()
 all = len(data)
 
-print("============================")
-print(" 작업할 자료는 총 {}개입니다".format(all))
-print("============================")
-# 다음 테스트 코드
-def daum_ad(lat, lon):
-    """
-    경위도 좌표를 역지오코딩하여 주소를 취득
-    :param lat: 위도(y)
-    :param lon: 경도(x)
-    :return: 주소 혹은 실패 문구
-    """
-    parms = {"apikey": daum_key, "x": lon, "y": lat, "inputCoordSystem": "WGS84", "output": "json"}
-    try:
-        r = requests.get(daum_url, params=parms)
-        ad = r.json()["old"]["name"]
-        if ad == "":
-            return "실패: 주소가 조회되지 않습니다."
-        return ad
-    except Exception as e:
-        return "실패: 에러발생 {}".format(e)
+#  지오코딩 테스트
+count = 0
+check = {}
+fail_list = []
+fail = 0
 
+with progressbar.ProgressBar(max_value=all) as bar:
+    for poi in data:
+        count += 1
+        ad = sk_ad(poi.lat, poi.lon)
+        if ad:
+            if len(ad) == 3:
+                poi.hjdAd, poi.bjdAd, poi.roadAd = ad
+            elif len(ad) == 2:
+                poi.hjdAd, poi.bjdAd = ad
+            else: # sk에서 받은 주소가 3개 이상이 아닐경우
+                check[poi.id] = ad
 
-# 다음 지오코딩 테스트
-d_ad_li = []  # 다음 지오코딩 결과
-d_count = 0  # 총 작업 횟수
-d_ok = 0  # 성공 횟수
-d_fail = 0  # 실패 횟수
+        else:
+            fail += 1
+            fail_list.append((poi.x,poi.lat,poi.lon))
 
-print("다음 역지오코딩후 db에 반영")
-for poi in data:
-    d_count += 1
-    print(d_count, "/", all, " : ", poi, "변환 요청")
-    ad = daum_ad(poi.lat, poi.lon)
-    if ad[:2] == "실패":
-        d_fail += 1
-        print("실패")
-    else:
-        # 조회 성공시 db에 주소 입력
-        d_ok += 1
-        poi.address = ad
-        print("성공")
+        bar.update(count)
 
 session.commit()
+
 print("==========================================================================")
-print("다음 지오코딩 결과/ 요청 :{0}  성공 : {1}, 실패 : {2}".format(all, d_ok, d_fail))
+print("역 지오코딩 결과/ 요청 :{0}  성공 : {1}, 실패 : {2}".format(all, all-fail, fail))
 print("==========================================================================")
-
-
-""""
-작업 결과
-==========================================================================
-다음 지오코딩 결과/ 요청 :6119  성공 : 6114, 실패 : 5
-==========================================================================
-
-실패한 5건은 아래와 같습니다.
-[ id: 1684 | lat: 35.2016 | lon:126.1367 ]
-[ id: 2189 | lat: 34.9415 | lon:128.088 ]
-[ id: 2484 | lat: 34.6792 | lon:127.3584 ]
-[ id: 4921 | lat: 37.5221 | lon:126.6685 ]
-[ id: 5557 | lat: 37.6568 | lon:127.1154 ]
-
-수작업으로 확인한 결과
-id 1684 | 낙월초등학교
-id 2189 | 삼천포종합운동장
-id 2484 | 과역초등학교
-id 4921 | 인천가현초등학교
-id 5557 | 인근공터로 유츄되나 확인 불가
-
-위와 같이 파악됬습니다. 그래서 다음 작업에서 해당 자료에 대한 보정 작업을 진행할 예정입니다.
+print("실패한 자료")
+pprint(fail_list)
+print("재확인 필요한 자료")
+pprint(check)
 
 """
-
+결과
+100% (6119 of 6119) |#####################| Elapsed Time: 0:11:41 Time: 0:11:41
+==========================================================================
+역 지오코딩 결과/ 요청 :6119  성공 : 6119, 실패 : 0
+==========================================================================
+실패한 자료
+[]
+재확인 필요한 자료
+{5516: "실패: 에러발생 Expecting ',' delimiter: line 1 column 95 (char 94)"}
+"""
