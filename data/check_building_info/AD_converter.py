@@ -15,13 +15,6 @@ import os
     (('29110', ['광주광역시', '동구']), ('12100', ['운림동']))
 """
 
-# 시군구,법정동 자료 불러오기
-with open('../check_building_info/sgg.json') as f:
-    sgg = json.load(f)
-
-with open('../check_building_info/bjd.json') as f:
-    bjd = json.load(f)
-
 def uplist(data,ad,num):
     """
     시군구 코드에서 특정 행정구역이 포함된 모든 코드를 추출합니다
@@ -41,6 +34,10 @@ def uplist(data,ad,num):
 
 # 주소를 입력받아 시군구코드와 법정동 코드를 구해주는 함수
 def sgg_cd(ad):
+    # 시군구 코드 자료 불러오기
+    with open('../check_building_info/sgg.json') as f:
+        sgg = json.load(f)
+
     ad_list = ad.split()
 
     # 주소 결과값이 1개가 나올때까지 행정구역 단위로 순회
@@ -66,6 +63,10 @@ def remove_sgg(sgg_ad,ad):
     return ad
 
 def bjd_cd(CD_ssg,ad):
+    # 법정동 코드 자료 불러오기
+    with open('../check_building_info/bjd.json') as f:
+        bjd = json.load(f)
+
     ad_list = ad.split()
     data = {}   # 해당 지역의 모든 법정동 코드
 
