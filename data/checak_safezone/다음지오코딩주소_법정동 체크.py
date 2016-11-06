@@ -578,7 +578,7 @@ engine = create_engine('sqlite:///check_safezone.sqlite')
 Session = sessionmaker(bind=engine)
 session = Session()
 
-data = session.query(POI).filter(POI.address != "").all()
+data = session.query(POI).filter(POI.bjdAd != "").all()
 
 count1 = 0
 count2 = 0
@@ -588,12 +588,12 @@ with progressbar.ProgressBar(max_value=len(data)) as bar:
     for x in data:
         count1 += 1
         # print(x.address)
-        CD = find_cd(x.address)
+        CD = find_cd(x.bjdAd)
         if CD:
             count2 += 1
             # print('test 결과',CD)
         else:
-            fail.append(x.address)
+            fail.append(x.bjdAd)
         bar.update(count1)
 
 
