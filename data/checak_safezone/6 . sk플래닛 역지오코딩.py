@@ -102,3 +102,11 @@ pprint(check)
 재확인 필요한 자료
 {5516: "실패: 에러발생 Expecting ',' delimiter: line 1 column 95 (char 94)"}
 """
+
+"""
+5516 자료 보정
+
+해당 자료를 요청하면 아래와 같은 결과가 나오는데 대림,벽산아파트가 큰따움표에 둘러쌓여 있음 이때문에 .split()를 하면 오류를 발생시키는것 같음
+{"addressInfo": {    "fullAddress": "서울특별시 노원구 중계본동,서울특별시 노원구 중계동 363-8,서울특별시 노원구 한글비석로8길 20 "대림,벽산아파트"",    "addressType": "A10",    "city_do": "서울특별시",    "gu_gun": "노원구",    "eup_myun": "",    "adminDong": "중계본동",    "adminDongCode": "1135061900",    "legalDong": "중계동",    "legalDongCode": "1135010600",    "ri": "",    "bunji": "363-8",    "roadName": "한글비석로8길",    "buildingIndex": "20",    "buildingName": ""대림,벽산아파트"",    "mappingDistance": "148.192442",    "roadCode": "113504130431"  }}
+그래서 위 자료는 임의로 db에 추가를 하였습니다.
+"""
