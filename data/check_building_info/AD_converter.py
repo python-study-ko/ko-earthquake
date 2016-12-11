@@ -1,5 +1,5 @@
 import json
-
+import os
 """
 주소를 입력하면 시구군,법정동 코드를 찾아주는 소스코드 입니다.
 행정표준코드관리 시스템에서 다운로드 받은 법정동코드 전체 자료(BJD_CD.txt)에서
@@ -14,13 +14,6 @@ import json
 >>> print(find_cd("광주광역시 동구 운림동 455"))
     (('29110', ['광주광역시', '동구']), ('12100', ['운림동']))
 """
-
-# 시군구,법정동 자료 불러오기
-with open('sgg.json') as f:
-    sgg = json.load(f)
-
-with open('bjd.json') as f:
-    bjd = json.load(f)
 
 def uplist(data,ad,num):
     """
@@ -41,6 +34,10 @@ def uplist(data,ad,num):
 
 # 주소를 입력받아 시군구코드와 법정동 코드를 구해주는 함수
 def sgg_cd(ad):
+    # 시군구 코드 자료 불러오기
+    with open('../check_building_info/sgg.json') as f:
+        sgg = json.load(f)
+
     ad_list = ad.split()
 
     # 주소 결과값이 1개가 나올때까지 행정구역 단위로 순회
@@ -66,6 +63,10 @@ def remove_sgg(sgg_ad,ad):
     return ad
 
 def bjd_cd(CD_ssg,ad):
+    # 법정동 코드 자료 불러오기
+    with open('../check_building_info/bjd.json') as f:
+        bjd = json.load(f)
+
     ad_list = ad.split()
     data = {}   # 해당 지역의 모든 법정동 코드
 
@@ -91,17 +92,52 @@ def bjd_cd(CD_ssg,ad):
         elif len(data) == 0:
             return None
 
+def lastAd(ad,sgg,bjd):
+    """
+    전체 주소에서 시구군,법정동 주소를 제외한뒤 번지 주소를 추출
+    :param ad: 전체 주소
+    :param bjd: 법정동 주소 리스트
+    :param sgg: 시구군 주소 리스트
+    :return: (대지구분,번,지) / 대지구분: 산 = 1, 구분없음 None;  번,지 : 존재할경우 숫자 없을경우 0000
+    """
+    result = []
+    # 주소에서 번지를 추출하기 위한 작업
+    ad = ad.split()
+    frontAd = sgg+bjd
+    for x in frontAd:
+        ad.remove(x)
 
+    # 번,지,산 등을 분류
+    last_ad = ''.join(ad)
+    # 산 여부 확인
+    if last_ad[0]== '산':
+        result.insert(0,1)
+        last_ad.replace('산','')
+    else:
+        result.insert(0,None)
 
+    # 번, 지 분리
+    if last_ad.find('-') != -1: # 번,지 모두 존재할 경우
+        bunji = last_ad.split('-')
+        result.insert(1,bunji[0].zfill(4))
+        result.insert(2,bunji[1].zfill(4))
+    else:
+        result.insert(1, last_ad.zfill(4))
+        result.insert(2, '0000')
+    return tuple(result)
 
 def find_cd(ad):
     CD_sgg = sgg_cd(ad)
     if CD_sgg:
         CD_bjd = bjd_cd(CD_sgg,ad)
         if CD_bjd:
-            return CD_sgg,CD_bjd
+            last = lastAd(ad,CD_sgg[1],CD_bjd[1])
+            ad_cd = {'sgg_cd':CD_sgg[0],'bjd_cd':CD_bjd[0],'bun':last[1],'ji':last[2],"land":last[0]}
+            return ad_cd
         else:
             return None
     else:
         return None
 
+# test code
+#print(find_cd("광주광역시 동구 운림동 455"))
